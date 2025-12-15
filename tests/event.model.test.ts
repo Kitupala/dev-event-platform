@@ -7,8 +7,7 @@ describe("Event model", () => {
   it("generates the correct slug from the title on save", async () => {
     const event = await Event.create(
       buildEventAttrs({
-        title: '  Bob\'s "Great" Event!!!  ',
-        slug: "will-be-overwritten",
+        title: "  Bob's \"Great\" Event!!!  ",
       }),
     );
 

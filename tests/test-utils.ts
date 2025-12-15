@@ -9,7 +9,6 @@ export const buildEventAttrs = (
 
   return {
     title,
-    // Required by schema, but overwritten by the pre-save hook when `title` changes.
     slug: overrides.slug ?? "placeholder-slug",
     description: "Test description",
     overview: "Test overview",

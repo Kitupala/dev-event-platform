@@ -201,9 +201,9 @@ const EventSchema = new mongoose.Schema<EventAttrs>(
 
 EventSchema.index({ slug: 1 }, { unique: true });
 
-EventSchema.pre("save", function (this: EventDoc) {
-  // Only regenerate the slug when the title changes.
-  if (this.isModified("title")) {
+EventSchema.pre("validate", function (this: EventDoc) {
+  // Generate slug before validation so `slug` can stay required in the schema.
+  if (this.isNew || this.isModified("title") || !this.slug) {
     const nextSlug = slugify(this.title);
     if (!nextSlug) throw new Error("Title must not be empty");
     this.slug = nextSlug;
