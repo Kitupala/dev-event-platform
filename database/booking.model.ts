@@ -3,7 +3,10 @@ import mongoose, {
   type Model,
   type Types,
 } from "mongoose";
-import { Event } from "./event.model";
+
+import { isNonEmptyString, isValidEmail } from "../lib/model-helpers";
+
+import Event from "./event.model";
 
 export interface BookingAttrs {
   eventId: Types.ObjectId;
@@ -11,14 +14,6 @@ export interface BookingAttrs {
 }
 
 export type BookingDoc = HydratedDocument<BookingAttrs>;
-
-const isNonEmptyString = (value: unknown): boolean =>
-  typeof value === "string" && value.trim().length > 0;
-
-const isValidEmail = (value: string): boolean => {
-  // Intentionally simple; strict RFC email regexes are often counterproductive.
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-};
 
 const BookingSchema = new mongoose.Schema<BookingAttrs>(
   {
@@ -54,5 +49,7 @@ BookingSchema.pre("save", async function (this: BookingDoc) {
   }
 });
 
-export const Booking: Model<BookingAttrs> =
+const Booking: Model<BookingAttrs> =
   mongoose.models.Booking ?? mongoose.model("Booking", BookingSchema);
+
+export default Booking;
