@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { Event } from "../database/event.model";
+import Event from "../database/event.model";
 import { buildEventAttrs } from "./test-utils";
 
 describe("Event model", () => {
   it("generates the correct slug from the title on save", async () => {
     const event = await Event.create(
       buildEventAttrs({
-        title: "  Bob's \"Great\" Event!!!  ",
+        title: '  Bob\'s "Great" Event!!!  ',
       }),
     );
 
