@@ -7,7 +7,7 @@ export const getSimilarEventsBySlug = async (slug: string) => {
   try {
     await dbConnect();
 
-    const event = await Event.findOne({ slug });
+    const event = await Event.findOne({ slug }).lean();
     if (!event) return [];
 
     return await Event.find({
