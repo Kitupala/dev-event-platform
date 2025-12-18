@@ -1,10 +1,18 @@
 import mongoose, { type HydratedDocument, type Model } from "mongoose";
 
+import {
+  isNonEmptyString,
+  isNonEmptyStringArray,
+  normalizeDateToISO,
+  normalizeTimeToHHmm,
+  slugify,
+} from "../lib/model-helpers";
+
 export type EventMode = "online" | "offline" | "hybrid" | (string & {});
 
 export interface EventAttrs {
   title: string;
-  slug: string;
+  slug?: string;
   description: string;
   overview: string;
   image: string;
@@ -20,49 +28,6 @@ export interface EventAttrs {
 }
 
 export type EventDoc = HydratedDocument<EventAttrs>;
-
-const isNonEmptyString = (value: unknown): boolean =>
-  typeof value === "string" && value.trim().length > 0;
-
-const isNonEmptyStringArray = (value: unknown): boolean =>
-  Array.isArray(value) && value.length > 0 && value.every(isNonEmptyString);
-
-const slugify = (value: string): string =>
-  value
-    .trim()
-    .toLowerCase()
-    .replace(/['"]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-
-const normalizeDateToISO = (value: string): string => {
-  // Normalize to `YYYY-MM-DD` (ISO 8601 date) for consistent querying/sorting.
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) throw new Error("Invalid date");
-  return d.toISOString().slice(0, 10);
-};
-
-const normalizeTimeToHHmm = (value: string): string => {
-  // Accept `H`, `HH`, `H:mm`, `HH:mm`, optionally with `am/pm`, and store as `HH:mm`.
-  const match = value
-    .trim()
-    .match(/^([0-1]?\d|2[0-3])(?::([0-5]\d))?\s*(am|pm)?$/i);
-  if (!match) throw new Error("Invalid time");
-
-  let hours = Number(match[1]);
-  const minutes = Number(match[2] ?? "0");
-  const meridiem = match[3]?.toLowerCase();
-
-  if (meridiem) {
-    // Convert 12h clock to 24h.
-    if (hours === 12) hours = 0;
-    if (meridiem === "pm") hours += 12;
-  }
-
-  const hh = String(hours).padStart(2, "0");
-  const mm = String(minutes).padStart(2, "0");
-  return `${hh}:${mm}`;
-};
 
 const EventSchema = new mongoose.Schema<EventAttrs>(
   {
@@ -199,11 +164,9 @@ const EventSchema = new mongoose.Schema<EventAttrs>(
   },
 );
 
-EventSchema.index({ slug: 1 }, { unique: true });
-
-EventSchema.pre("save", function (this: EventDoc) {
-  // Only regenerate the slug when the title changes.
-  if (this.isModified("title")) {
+EventSchema.pre("validate", function (this: EventDoc) {
+  // Generate slug before validation so `slug` can stay required in the schema.
+  if (this.isNew || this.isModified("title") || !this.slug) {
     const nextSlug = slugify(this.title);
     if (!nextSlug) throw new Error("Title must not be empty");
     this.slug = nextSlug;
@@ -214,5 +177,7 @@ EventSchema.pre("save", function (this: EventDoc) {
   this.time = normalizeTimeToHHmm(this.time);
 });
 
-export const Event: Model<EventAttrs> =
+const Event: Model<EventAttrs> =
   mongoose.models.Event ?? mongoose.model("Event", EventSchema);
+
+export default Event;

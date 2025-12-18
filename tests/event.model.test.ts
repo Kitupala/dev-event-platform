@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Event } from "../database/event.model";
+import Event from "../database/event.model";
 import { buildEventAttrs } from "./test-utils";
 
 describe("Event model", () => {
@@ -8,7 +8,6 @@ describe("Event model", () => {
     const event = await Event.create(
       buildEventAttrs({
         title: '  Bob\'s "Great" Event!!!  ',
-        slug: "will-be-overwritten",
       }),
     );
 
