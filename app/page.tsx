@@ -3,7 +3,9 @@ import EventCard from "@/components/EventCard";
 import { EventAttrs } from "@/database/event.model";
 import { cacheLife } from "next/cache";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? (() => {
+  throw new Error("NEXT_PUBLIC_BASE_URL environment variable is required");
+})();
 
 const Page = async () => {
   "use cache";
