@@ -14,6 +14,20 @@ pnpm dev
 bun dev
 ```
 
+## Seeding events (CLI)
+
+This repo includes a CLI seeder that loads `detailedEvents` from `lib/constants.ts` into MongoDB and uploads local images from `public/images` to Cloudinary.
+
+Prerequisites: set `MONGODB_URI` and `CLOUDINARY_URL` in your environment.
+
+```bash
+# Preview what would be inserted/updated (no DB writes)
+npm run seed:events:dry
+
+# Seed the database (overwrites existing events by slug)
+npm run seed:events
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
