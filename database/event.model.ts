@@ -22,9 +22,9 @@ export interface EventAttrs {
   time: string;
   mode: EventMode;
   audience: string;
-  agenda: string[];
+  agenda?: string[];
   organizer: string;
-  tags: string[];
+  tags?: string[];
 }
 
 export type EventDoc = HydratedDocument<EventAttrs>;
