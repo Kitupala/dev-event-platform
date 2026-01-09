@@ -47,9 +47,10 @@ const EventTags = ({ tags }: { tags: string[] }) => (
   </div>
 );
 
-const EventDetails = async ({ slug }: { slug: string }) => {
+const EventDetails = async ({ params }: { params: Promise<string> }) => {
   "use cache";
   cacheLife("hours");
+  const slug = await params;
 
   let event;
   try {
@@ -158,8 +159,7 @@ const EventDetails = async ({ slug }: { slug: string }) => {
               <p className="text-sm">Be the first to book your spot!</p>
             )}
 
-            {/*eventId={event._id} slug={event.slug}*/}
-            <BookEvent />
+            <BookEvent eventId={event._id} slug={event.slug} />
           </div>
         </aside>
       </div>
